@@ -1,26 +1,35 @@
 import fs from 'fs';
-import fetch from 'node-fetch';
 
-export const fromSequelize = (file: string) => {
+const readJavascriptCodeFromFile = (file: string) => {
     // I will rewrite the code so it's better 
     // but read the file
-    fs.readFile(file, 'utf8', (err, data) => {
-        if (err) {
-            console.error(err);
-            return;
-        }
-        // write it to a javascript
-        fs.writeFile('./temp/xxx.js', data, (err) => {
-            if (err) throw err;
-            // get your required file
-            const Default = require('../../temp/xxx.js');
-            console.log(Default.name);
-            console.log(Default.attributes);
-            // do our conversion, we have javascript, 
-        });
+    const data = fs.readFileSync(file, 'utf-8');
+    // write to a temporary folder, use __dir
+    fs.writeFileSync(`./temp/xxx.js`, data);
 
-    });
+    // read file out.
+    const Default = require('../../temp/xxx.js');
+    console.log(Default);
 
+    console.log(Default.default.name);
+    console.log(Default.default.attributes);
+    return Default.default;
 }
 
-fromSequelize('./dist/testing/seq.schema.js');
+
+export const fromORM = (file: string) => {
+
+    const schema = readJavascriptCodeFromFile(file);
+
+    // convert to JSON
+    const standardSchema = {
+        entity: schema.name,
+        tables: schema.name,
+        attributes: {
+            // whatever
+        }
+    }
+    console.log(standardSchema);
+}
+
+fromORM('./dist/testing/seq.schema.js');
